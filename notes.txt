@@ -1,0 +1,37 @@
+*make bsvc when you make new program
+bsvc serial.setup
+__________________________________________
+cp -r template/ othername
+ls
+cd othername
+ls
+cp template.s
+
+
+_________________________________________
+new directory
+
+mkdir handin
+ls
+
+cp othername/template.s handin/monkey.s
+ls handin/
+
+__________________________________________
+rm template.s = remove 1
+rm template.* = all files are deleted
+__________________________________________
+
+for new file
+
+
+
+
+
+
+start :
+
+
+	move.l #4,D1
+	move.l #6,D2
+	mulu   D1,D2

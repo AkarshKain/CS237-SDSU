@@ -1,0 +1,132 @@
+
+**----------------------------------------------------------------------
+* Programmer: Akarsh Kain
+* Class Account: cssc1344
+* Assignment or Title: Assigment 4
+* Filename: prog4.s
+* Date completed: 12/18/17 
+*----------------------------------------------------------------------
+* Problem statement: Enter two numbers and program will give their gcd
+* Input: Two Numbers
+* Output: GCD
+* Error conditions tested: input space seperated numbers
+* Included files: gcd.s 
+* Method and/or pseudocode: User will input two numbers which are space sperated then program will seperate those numbers and send them to subroutine and calculate the gcd. The gcd will be returned by the pseudocode and main program will output it.
+* References: Prof Scott
+*----------------------------------
+
+*------------------------------------
+*
+        ORG     $0
+        DC.L    $3000           * Stack pointer value after a reset
+        DC.L    start           * Program counter value after a reset
+        ORG     $3000           * Start at location 3000 Hex
+*
+*----------------------------------------------------------------------
+*
+#minclude /home/cs/faculty/cs237/bsvc/macros/iomacs.s
+#minclude /home/cs/faculty/cs237/bsvc/macros/evtmacs.s
+*
+*----------------------------------------------------------------------
+*
+*	
+*----------------------------------------------------------------------
+*
+	start:  
+	initIO                  * Initialize (required for I/O)
+	setEVT			* Error handling routines
+*	initF			* For floating point macros only		
+
+	clr.l   D0
+        clr.l   D1
+        clr.l   D2
+	clr.l	D3
+	clr.l	D5
+        clr.l	D6
+
+gcd:  	EQU     $7000
+
+        lineout title
+        lineout prompt
+        linein  input1
+	lea 	input1,A0	*A0 will now point at input.
+	adda.l	D0,A0
+	move.b	#0,(A0)		*adding null pointer at the end of the input
+	lea	input1,A0
+	move.l	A0,A1		*moving A0 to A1 to note the length of number
+	clr.l	D0
+        
+loop:	cmpi.b	#0,(A0)		*checking the null value at the end of input
+	beq	end		*if null is found, the end loop would be called.
+	cmpi.b	#' ',(A0)	* checking for space between two numbers.
+	beq	num1		*if space is found num1 loop would be called
+	add.l	#1,A0
+	bra	loop
+
+
+num1:				*loop to find fisrt number
+	move.l	A0,D6		*moving value of A0 to D6	
+	move.l	A1,D5
+	sub.w	D5,D6		*D6 will have the lenght of the number
+	sub.l	D6,A0
+	cvta2	(A0),D6		*converting the value at A0 by D6 times
+	move.l	D0,D2
+	add.l	D6,A0
+	clr.l	D6
+	clr.l	D5
+	add.l	#1,A0		*increasing A0 by 1
+	move.l	A0,A1		*storing A0 into A1 
+	bra	num2
+
+incadd:				*loop to increase the value of A0 by 1.
+	add.l	#1,A0		
+	bra	num2
+	
+num2:	cmpi.b	#0,(A0)		*check for null
+	beq	end
+	bra	incadd
+			
+end:				*loop to find second number
+	move.l	A0,D6
+	move.l	A1,D5
+	sub.w	D5,D6
+	sub.w	D6,A0		*D6 will now have the lenght of second number
+	cvta2	(A0),D6
+	move.l	D0,D3
+	move.w	D2,-(SP)
+	move.w	D3,-(SP)
+	clr.l	D0
+	
+	jsr	gcd		*calling the subroutine
+	adda.l	#4,SP
+	
+	cvt2a	value,#10	
+	stripp	value,#10
+	lea	value,A2	*A2 will now point value
+	add.l	D0,A2		*value will now contain the gcd
+	bra 	dot
+	
+dot:	
+	move.b	#'.',(A2)+	*moving "." after the answer
+	move.b	#0,(A2)+	*moving null pointer at the end.
+	
+exit:	lineout	line
+	
+	
+	break
+
+
+	
+	
+
+*----------------------------------------------------------------------
+*       Storage declarations
+                                *My Storage declaration goes here
+
+title:	dc.b 	'Program #4, Akarsh Kain, cssc1344',0
+prompt: dc.b    'Enter two numbers seperated by a space:',0
+input1: ds.b    10	
+line:   dc.b    'Their GCD is '
+value:	ds.b    10
+        end
+	break

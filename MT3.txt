@@ -1,0 +1,126 @@
+ques 1 message 1
+ques 2 message 2
+
+3) 	move.l		#0,D1
+	move.l		#100,D0
+
+loop: 	cmp.b	#0,D0
+	ble	exit
+	move.l	D0,D2
+	divu	#3,D2
+	swap	D2	
+	cmp.b	#1,D2
+	BEQ	loop2
+	
+	divu	#2,D0
+	sub.l	#1,D0
+	bra	loop	
+	
+
+loop2: 	add.l	D0,D1
+	divu	#2,D0
+	sub.l	#1,D0
+	bra	loop
+
+print:	move.l	D1,D0	
+	cvt2a	buff,#3
+	stripp	buff,#3
+	lea	buff,A1
+	add.l	D0,A1
+	move.b 	#0,(A1)
+	lineout	buff
+	bra	increase	
+		
+exit:		break     
+*
+*----------------------------------------------------------------------
+*       Storage declarations
+
+buff	ds.l	80
+
+        end
+
+
+ques 5 	A)	0000000000009
+		0000
+	B)	0000000000008
+		0000
+	C)	0000 341A
+		0000
+	D)	
+
+
+4	A)	0011
+	B)	yes,no,yes,no,yes,no 
+	
+
+
+6)move.l		#1,D1
+
+
+
+loop:	cmp	#100,D1
+	BGT	after
+	bra	mul
+	
+
+mul:		move.l	D1,D2
+		divu	#3,D2
+		swap 	D2
+		move.b	D2,D3
+		cpm	#0,D3
+		BEQ		three
+		move.l	D1,D4
+		divu	#5,D4
+		swap	D4		
+		cpm	#0,D4
+		BEQ		five
+		
+	
+increase:	addq	#1,D1
+		bra	loop
+		
+		break
+three: 		move	D1,D5
+		divu	#5,D5
+		swap	D5
+		cpm.w	#0,D5
+		BEQ	both
+		lineout	fizz
+		bra	increase
+
+both: 		lineout	fizzbuzz
+		bra 	increase
+
+
+five:		lineout buzz
+		bra	increase
+
+print:		move.l	D1,D0	
+		cvt2a	buff,#3
+		stripp	buff,#3
+		lea	buff,A1
+		add.l	D0,A1
+		move.b 	#0,(A1)
+		lineout	buff
+		bra	increase	
+
+
+after:		
+		break
+*
+*----------------------------------------------------------------------
+*       Storage declarations
+fizz:	dc.b	'Fizz',0
+buzz:	dc.b	'Buzz',0
+buff:	ds.l	4	
+fizzbuzz: dc.b	'FizzBuzz',0
+
+				
+
+        end
+
+
+
+
+	

@@ -1,0 +1,83 @@
+*----------------------------------------------------------------------
+* Programmer: Akarsh Kain
+* Class Account: cssc0815
+* Assignment or Title: Assignment 2
+* Filename: prog2.s
+* Date completed: 03/14/2018  
+*----------------------------------------------------------------------
+* Problem statement: Write a loan payment calculator which accepts the values from user.
+* Input: The principal (the amount borrowed), the interest rate APR (annual percentage rate) and the length of the loan in months.
+* Output: Monthly payment
+* Error conditions tested: input numbers
+* Included files: none
+* Method and/or pseudocode: User will enter a the required values and then program will calculate those values and mreturns the asnwer in terms of monthly payment.
+* References: TA Mark and Gaurav
+*----------------------------------------------------------------------
+*
+        ORG     $0
+        DC.L    $3000           * Stack pointer value after a reset
+        DC.L    start           * Program counter value after a reset
+        ORG     $3000           * Start at location 3000 Hex
+*
+*----------------------------------------------------------------------
+*
+#minclude /home/cs/faculty/riggins/bsvc/macros/iomacs.s
+#minclude /home/cs/faculty/riggins/bsvc/macros/evtmacs.s
+*
+*----------------------------------------------------------------------
+*
+* Register use
+*
+*----------------------------------------------------------------------
+*
+start:  initIO                  * Initialize (required for I/O)
+	setEVT			* Error handling routines
+	initF			* For floating point macros only	
+
+	lineout	title			
+	lineout	newline
+	lineout	prompt1
+	floatin	buffer1			*takes amount borrowed for the lone (P)	
+	cvtaf	buffer1,D1
+	lineout	prompt2
+	floatin	buffer1			*takes the annual interest rate (r)
+	cvtaf	buffer1,D2	
+	lineout	prompt3
+	floatin	buffer1			*takes the length of the loan (n)
+	cvtaf	buffer1,D3
+	itof	#12,D4			*converts the number 12 into floating point and saves in D4
+	fdiv	D4,D2			*dividing 12 by annual interest rate to make it monthly interest rate
+	itof	#100,D4			*converts 100 to floating point
+	fdiv	D4,D2			*dividing 100 to make it in percentage form
+	move.l	D2,D5			*making a copy of annual interest rate		
+	itof	#1,D7			*converts 1 to floating point
+	fadd	D7,D5
+	fpow	D5,D3			*increases power (1+r)^n and saves in D3	
+	move.l	D0,D6
+	move.l	D0,D3			
+	fmul	D2,D6			*multiplying the annual percentage rate with the above equation r(1+r)^n
+	fsub	D7,D3			*subtracting 1 from the above equation.
+	fdiv	D3,D6			*dividing both equation
+	fmul	D1,D6			*multiplying everything with the amount of loan
+	lea	number,A1
+	cvtfa	(A1),#2			*converting answer so it will support two decimal places after the decimal
+	fadd	D6,A1
+	lineout	newline
+	lineout	answer
+        break                   	* Terminate execution
+*
+*----------------------------------------------------------------------
+*       Storage declarations
+
+newline:dc.b	0
+title:	dc.b	'Program #1, Akarsh Kain, cssc0815',0
+prompt1	dc.b	'Enter the amount of the loan:',0
+buffer1:ds.b	80
+prompt2:dc.b	'Enter the anual percentage rate:',0
+prompt3:dc.b	'Enter the lenght of the loan in months:',0
+answer:	dc.b	'Your monthly payment will be $'
+number:	ds.b	100
+	end
+
+				
+        

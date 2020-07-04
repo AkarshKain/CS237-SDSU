@@ -1,0 +1,14 @@
+<HTML>
+<HEAD>
+	 <TITLE>	Sanya's Web Page	 </TITLE> 
+</HEAD> 
+
+<BODY text="white" bgcolor="black">
+
+<H2 align="center"><B><U>Welcome to Sanya's Webpage</B></U></H3>
+
+
+<I align="center">This is my MIS Project</I>
+
+<BR><U>About Me</U><BR>
+

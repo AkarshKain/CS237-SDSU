@@ -1,0 +1,22 @@
+ORG	$8000
+	
+gcd:	link	A6,#0		
+	movem.l	D1-D2,-(SP)		
+	move.w	8(A6),D2	*picking up second number from stack 
+	move.w	10(A6),D1	*picking up first number from stack	
+	cmpi.w 	#0,D2		
+	bne	loop1
+	move.w	D1,D0
+	bra	loop2
+
+loop1:	divu	D2,D1		*dividing D2 by D1 to find gcd
+	swap	D1
+	ext.l	D1
+	move.w	D2,-(SP)	*sending values back to stack
+	move.w	D1,-(SP)
+	jsr	gcd
+	adda.l	#4,SP	
+
+loop2:	movem.l	(SP)+,D1-D2
+	unlk 	A6
+	rts			*returning the value in D0	

@@ -1,0 +1,333 @@
+*----------------------------------------------------------------------
+* Programmer: Akarsh Kain
+* Class Account: cssc0815
+* Assignment or Title: Assignment 3
+* Filename: prog3.s
+* Date completed: 04/16/2018  
+*----------------------------------------------------------------------
+* Problem statement: Write a program that will calculate the bills and coins to equal the input amount.
+* Input: Amount in US Dollars
+* Output: Bills and Coins eqaul to the amount
+* Error conditions tested: input amount
+* Included files: none
+* Method and/or pseudocode: User will enter the required values and then program will split values into bills and coins and then gives final answer.
+* References: TA Mark, Gaurav and Prof Riggins
+*----------------------------------------------------------------------
+*
+        ORG     $0
+        DC.L    $3000           * Stack pointer value after a reset
+        DC.L    start           * Program counter value after a reset
+        ORG     $3000           * Start at location 3000 Hex
+*
+*----------------------------------------------------------------------
+*
+#minclude /home/cs/faculty/riggins/bsvc/macros/iomacs.s
+#minclude /home/cs/faculty/riggins/bsvc/macros/evtmacs.s
+*
+*----------------------------------------------------------------------
+*
+* Register use
+*
+*----------------------------------------------------------------------
+*
+start:  initIO                  * Initialize (required for I/O)
+	setEVT			* Error handling routines
+	initF			* For floating point macros only	
+
+	lineout	title	
+	lineout	newline
+
+loop:	lineout	prompt1
+	linein	amount
+	stripp  amount,D0 	*removes all the leading zeros in the input
+	lea	amount,A0
+	clr.l	D1		*clearing all the data registers before using them
+	clr.l	D2
+	clr.l	D4
+	clr.l	D5
+	move.l	D0,D7		*D7 also has length
+	move.l	D0,D4		*D4 also has the length
+	sub.l	#1,D7
+	move.l	A0,A1
+	move.l	A0,A4
+	lea	decimalnum,A3	
+
+testing2:			*checks if there are two digits after the decimal 
+	add.l	D4,A1		*takes the pointer at the end of the input address
+	sub.l	#3,A1		*taking the pointer at the position where period is expected
+	cmpi.b	#'.',(A1)
+	bne	error
+	sub.l	#3,D4		
+loop1:				*another error testing for each number
+	cmpi.b	#'9',(A0)
+	bgt	decimal		*checks if it is a decimal or not
+	cmpi.b	#'0',(A0)
+	blt	decimal
+	addq	#1,A0
+	add.b	#1,D1
+	cmp.b	D1,D7		*loop will run unitl D1 becomes equal to the lenght of the input
+	beq	limit
+	bra	loop1						
+
+dcheck:	add.l	#1,D5
+	bra	loop1
+decimal:			
+ 	cmpi.b	#'.',(A0)+	
+	beq	dcheck
+	bra 	error
+limit:				*loop to split whole number and decimal number
+	cvta2	amount,D4	
+	move.l	D0,D2		*D2 is the whole number
+	cmpi.l	#32767,D2	*comparing the number before decimal if it is in the limit or not
+	bgt	error
+	add.l	#1,D4
+	add.l	D4,A4	
+	cvta2	(A4),#2	
+	move.l	D0,D3		*D3 is the decimal number	
+	cmpi.l	#0,D2
+	beq	zero		*sends to zero if the the dollar bill is 0.
+	bra 	main
+zero:	
+	cmpi.l	#0,D3		*this part checks if the input is "0.00" and if there are more than two decimal
+	beq	error
+	cmpi.l	#1,D5
+	bne	error
+	bra	main
+error:	
+	lineout	newline
+	lineout	prompt2
+	bra	loop
+
+main:	clr.l	D1
+	clr.l	D7
+	lineout	newline
+	lineout	answer
+hundred:
+	cmpi.l	#100,D2		*checks if the input is less than 100
+	blt	check100			
+	sub.l	#100,D2
+	add.l	#1,D7
+	bra	hundred
+check100:	
+	cmpi.l	#0,D7		*checks if there is no 100 dollar bill so that it could jump to another bill
+	beq	fifty
+	
+output:	cmpi.l	#99,D7		*checks if number of 100 bills are greater than 99 or not	
+	bgt	opt3		* if they are then it goes to another loop
+	bra	output2			
+output2:			*this loop checks if the nunmber of 100 are greater than 10 or less than 10
+	cmpi.l	#10,D7	
+	bgt	opt2   	 		 	  	   
+	
+opt1:	lea	b100,A2		*if number of dollar bills is one digit then this loop will occur
+	move.l	D7,D0
+	cvt2a	(A2),#1
+	lineout	b100
+	clr.l	D7
+	bra	fifty
+
+opt2:	lea	b1001,A2	*if number of dollar bills is two digit then this loop will occur
+	move.l	D7,D0
+	cvt2a	(A2),#2
+	lineout	b1001
+	clr.l	D7
+	bra	fifty
+	
+opt3:	lea	b1002,A2	**if number of dollar bills is three digit then this loop will occur
+	move.l	D7,D0
+	cvt2a	(A2),#3
+	lineout	b1002
+	clr.l	D7
+	bra	fifty
+		
+fifty:	cmpi.l	#50,D2		*runs the loop until the input becomes less than 50
+	blt	check50
+	sub	#50,D2	
+	add.l	#1,D7			
+	bra	fifty
+check50:	
+	cmpi.l	#0,D7		*checks if there is no 50 dollar bill so that it could jump to another bill
+	beq	twenty
+comp50:	
+	lea	b50,A2
+	move.l	D7,D0
+	cvt2a	(A2),#1
+	lineout	b50
+	clr.l	D0
+	clr.l	D7
+twenty: 			*runs the loop until the input becomes less than 20
+	cmpi.l	#20,D2
+	blt	check20
+	sub	#20,D2
+	add.l	#1,D7
+	bra	twenty
+check20:	
+	cmpi.l	#0,D7		*checks if there is no 20 dollar bill so that it could jump to another bill
+	beq	ten
+		
+comp20:	lea	b20,A2
+	move.l	D7,D0
+	cvt2a	(A2),#1
+	lineout	b20
+	clr.l	D0
+	clr.l	D7
+
+ten:	cmpi.l	#10,D2		*runs the loop until the input becomes less than 10
+	blt	check10
+	sub	#10,D2
+	add.l	#1,D7
+	bra	ten
+check10:	
+	cmpi.l	#0,D7		*checks if there is no 10 dollar bill so that it could jump to another bill
+	beq	five
+	
+comp10:	lea	b10,A2
+	move.l	D7,D0
+	cvt2a	(A2),#1
+	lineout	b10
+	clr.l	D0
+	clr.l	D7
+
+five:	cmpi.l	#5,D2		*runs the loop until the input becomes less than 5
+	blt	check5
+	sub	#5,D2
+	add.l	#1,D7
+	bra	five
+check5:	
+	cmpi.l	#0,D7		*checks if there is no 5 dollar bill so that it could jump to another bill
+	beq	one
+	
+comp5:	lea	b5,A2
+	move.l	D7,D0
+	cvt2a	(A2),#1
+	lineout	b5
+	clr.l	D0
+	clr.l	D7
+
+one:	cmpi.l	#1,D2		*runs the loop until the input becomes less than 1
+	blt	check1
+	sub	#1,D2
+	add.l	#1,D7
+	bra	one
+check1:	
+	cmpi.l	#0,D7		*checks if there is no 1 dollar bill so that it could jump to cents
+	beq	cent50
+	
+comp1:	lea	b1,A2
+	move.l	D7,D0
+	cvt2a	(A2),#1
+	lineout	b1
+	clr.l	D0
+	clr.l	D7
+
+cent50:	cmpi.l	#50,D3		*runs the loop until the input becomes less than 50 cents
+	blt	check05
+	sub	#50,D3
+	add.l	#1,D7
+	bra	cent50
+check05:	
+	cmpi.l	#0,D7		*checks if there is no 50 cents so that it could jump to other cents
+	beq	cent25
+compp50:
+	lea	coin50,A2
+	move.l	D7,D0
+	cvt2a	(A2),#1
+	lineout	coin50
+	clr.l	D0
+	clr.l	D7
+
+cent25: cmpi.l	#25,D3 		*runs the loop until the input becomes less than 25 cents
+	blt	check25
+	sub	#25,D3
+	add.l	#1,D7
+	bra	cent25
+check25:	
+	cmpi.l	#0,D7		*checks if there is no 25 cents so that it could jump to other cents
+	beq	cent10
+compp25:
+	lea	coin25,A2
+	move.l	D7,D0
+	cvt2a	(A2),#1
+	lineout	coin25
+	clr.l	D0
+	clr.l	D7		
+
+cent10: cmpi.l	#10,D3		*runs the loop until the input becomes less than 10 cents
+	blt	chek10
+	sub	#10,D3
+	add.l	#1,D7
+	bra	cent10
+chek10:	
+	cmpi.l	#0,D7		*checks if there is no 10 cents so that it could jump to other cents
+	beq	cent5
+compp10:
+	lea	coin10,A2
+	move.l	D7,D0
+	cvt2a	(A2),#1
+	lineout	coin10
+	clr.l	D0
+	clr.l	D7
+
+cent5:	cmpi.l	#5,D3		*runs the loop until the input becomes less than 5 cents
+	blt	chek5
+	sub	#5,D3
+	add.l	#1,D7
+	bra	cent5
+chek5:	
+	cmpi.l	#0,D7		*checks if there is no 5 cents so that it could jump to other cents
+	beq	cent1
+compp5:	
+	lea	coin5,A2
+	move.l	D7,D0
+	cvt2a	(A2),#1
+	lineout	coin5
+	clr.l	D0
+	clr.l	D7
+
+cent1:	cmpi.l	#1,D3		*runs the loop until the input becomes less than 1 cent
+	blt	chek1
+	sub	#1,D3
+	add.l	#1,D7
+	bra	cent1
+chek1:	
+	cmpi.l	#0,D7		*checks if there is no 1 cents so that it could end
+	beq	exit
+compp1:	
+	lea	coin1,A2
+	move.l	D7,D0
+	cvt2a	(A2),#1
+	lineout	coin1
+	clr.l	D0
+	clr.l	D7
+
+exit:	break                   * Terminate execution
+
+*----------------------------------------------------------------------
+*       Storage declarations
+
+newline:   dc.b		0
+title:     dc.b		'Program #1, Akarsh Kain, cssc0815',0
+prompt1:   dc.b		'Enter an amount in U.S. Dollars (no $ sign):',0
+prompt2:   dc.b		'Sorry, invalid entry.',0
+amount:	   ds.b		80
+decimalnum:ds.b		80
+value:	   ds.b		80
+answer: dc.b		'That amount is:',0
+b100:  	dc.b		'  x $100',0
+b1001:  dc.b		'   x $100',0
+b1002:  dc.b		'    x $100',0
+b50:    dc.b		'  x $50',0
+b20:    dc.b		'  x $20',0
+b10:    dc.b		'  x $10',0
+b5:     dc.b		'  x $5',0
+b1:     dc.b		'  x $1',0
+coin50:	dc.b		'  x 50',$A2,0
+coin25: dc.b		'  x 25',$A2,0
+coin10: dc.b		'  x 10',$A2,0
+coin5:  dc.b		'  x 5',$A2,0
+coin1:  dc.b		'  x 1',$A2,0
+
+	end
+
+				
+        

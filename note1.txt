@@ -1,0 +1,91 @@
+
+<html>
+	<head>
+		<title>  Sanya's Webpage
+		</title>
+	</head>
+	<body bgcolor=black text=white>
+	
+    <h1 align="center"><b>Welcome to Sanya's Webpage</b></h1>
+ 
+  
+	<H2 align="center"><I><u>This is my MIS Project</u></I></H2><br>
+    
+      <H3>
+      About Me
+        	<img src="http://caccioppoli.com/Gif%20linee%20animate/Rainbow_line_2.gif">
+      </H3> 
+      <p>
+       Hello! I am an international student at San Diego State University from India. My major is MIS and I love it. I am a freshman and I will be graduating in May 2022.
+      </p>
+   
+      <p align="right">You will get to learn more about me from this webpage.</p>
+      
+            <H3>
+       Things I Love
+        	<img src="http://caccioppoli.com/Gif%20linee%20animate/Rainbow_line_2.gif">	
+      </H3> 
+    <ol>
+		<li>Traveling </li>
+		<li>Pandas</li>
+       <li>Beaches</li>   
+      <li>Shopping</li>
+		<li>Trujillos (Mexican Restaurant)</li>
+	</ol>
+      
+      <H3> Things on my bucket list
+        <img src="http://caccioppoli.com/Gif%20linee%20animate/Rainbow_line_2.gif">	</H3>
+	<table border="5">  
+		<tr> 
+			<th>Serial no.</th>
+			<th>Things</th>
+			<th>Location</th>
+		</tr>
+		<tr>
+			<td>1</td>
+			<td>Skydiving</td>
+			<td>Dubai</td>
+		</tr>
+		<tr>
+			<td>2</td>
+			<td>Bungee Jumping</td>
+			<td>New Zealand</td>
+		</tr>
+		<tr>
+			<td>3</td>
+			<td>World Tour</td>
+			<td>N/A</td>
+		</tr>
+      <tr>
+			<td>4</td>
+			<td>Pet a Panda</td>
+			<td>China</td>
+		</tr>
+	</table><br><br>
+      
+ <H3>What I find the cutest
+        <img src="http://caccioppoli.com/Gif%20linee%20animate/Rainbow_line_2.gif">	</H3>
+	<u><p align="center"> <b><u>Picture</u></b></p></u>
+      <p align="center">
+	<img src="https://i.chzbgr.com/full/7116049152/h7B1309F0/" height="400" align=>
+      </p>
+      <br><br>
+      <u><p align=center><b><u>Video</u></b><br><br>Click The Panda</p></u>
+     <p align="center">
+       <a href="https://www.youtube.com/watch?v=CF43mcn0Rrc">
+         <img src="https://thumbs.gfycat.com/AncientNaiveArizonaalligatorlizard.webp" height="250">
+       </a> 
+      </p> 
+
+      <br><br>
+       <H3> Email  Me Here
+        <img src="http://caccioppoli.com/Gif%20linee%20animate/Rainbow_line_2.gif">
+         </H3>
+      <p>
+        --------->
+      <a href=mailto:"sanyashah50@yahoo.in" > <b>Sanya's Email ID</b></a>
+      </p>      
+	<br>
+	<br>
+	</end>
+</html>   

@@ -1,0 +1,27 @@
+3110||	alpha:	dc.w	2,4,6
+3116||	beta:	ds.l	1
+311A||	gamma:	dcb.b	4,2
+311E||	zeta:	dcb.b	2,4
+
+
+
+linein	buffer
+cvta2	buffer,D0
+
+
+
+
+ds	<#needed>
+dc	<value>
+dcb 	<count>,<value>
+
+
+program
+
+move,move.l
+add, addq, addi,adda
+sub...
+clr
+lea
+muls,mulu
+divs,divu

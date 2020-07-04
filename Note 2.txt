@@ -1,0 +1,11 @@
+array : ds.l 1
+input  ds.b 80
+
+
+
+linein	input
+cvta2	input,#1
+movel	D0, array+0
+
+cvta2	input+2, #1
+move.l	D0, array+4

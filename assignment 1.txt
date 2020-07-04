@@ -1,0 +1,92 @@
+*----------------------------------------------------------------------
+* Programmer: Akarsh Kain
+* Class Account: cssc1337 
+* Assignment or Title: 
+* Filename: 
+* Date completed:  
+*----------------------------------------------------------------------
+* Problem statement:
+* Input: 
+* Output: 
+* Error conditions tested: 
+* Included files: 
+* Method and/or pseudocode: 
+* References: 
+*----------------------------------------------------------------------
+*
+        ORG     $0
+        DC.L    $3000           * Stack pointer value after a reset
+        DC.L    start           * Program counter value after a reset
+        ORG     $3000           * Start at location 3000 Hex
+*
+*----------------------------------------------------------------------
+*
+#minclude /home/cs/faculty/cs237/bsvc/macros/iomacs.s
+#minclude /home/cs/faculty/cs237/bsvc/macros/evtmacs.s
+*
+*----------------------------------------------------------------------
+*
+* Register use
+*
+*----------------------------------------------------------------------
+*
+start:  initIO                  * Initialize (required for I/O)
+	setEVT			* Error handling routines
+*	initF			* For floating point macros only	
+
+
+
+
+        lineout title
+        lineout prompt
+        linein  input
+        cvta2   input,#1
+        move.l  D0,D1
+        cvta2   input+2,#2
+        move.l  D0,D2
+        *move.l D2,D3
+        add.l   D1,D2
+        *move.l #7,D3
+        divu    #7,D2
+        swap    D2
+        move.w  D2,D3
+        *sub.l   #1,D3
+        mulu    #10,D3
+        lea     days,A0
+        adda.l  D3,A0
+        move.b  (A0)+,value
+	move.b  (A0)+,value+1
+	move.b	(A0)+,value+2
+	move.b	(A0)+,value+3
+	move.b	(A0)+,value+4
+	move.b  (A0)+,value+5
+	move.b  (A0)+,value+6
+	move.b	(A0)+,value+7
+	move.b	(A0)+,value+8
+	move.b	(A0)+,value+9
+        lineout answer
+
+
+
+
+        break                   * Terminate execution
+*
+*----------------------------------------------------------------------
+*       Storage declarations
+
+
+prompt: dc.b    'Enter the start day [1-7] and the number to add [01-20]: ',0
+
+days:   dc.b    'Sunday   ',0
+        dc.b    'Monday   ',0
+        dc.b    'Tuesday  ',0
+        dc.b    'Wednesday',0
+        dc.b    'Thursday ',0
+        dc.b    'Friday   ',0
+        dc.b    'Saturday ',0
+
+answer: dc.b    'That day is '
+value:  ds.b    20
+input:  ds.b    80
+
+        end

@@ -1,0 +1,515 @@
+*address = find(start,char)
+A1= find(loc,'')
+	org	$7000
+find:	link A6,#0
+	movem.l D1/A1,-(SP)
+			 	*get Arguments from stack
+	move.w	8(A6),D1
+	move.l	10(A6),	 	*A valid char
+	move.l	12(A6),A1 	*the address to start at
+top:	cmp.b	D1,(A1)
+	beq	not
+	bra	is
+
+	bra 	top 
+	
+
+	*check for is 
+is:	cmp.b	D1,( A1 )
+	beq	rest
+	adda.l	#1,A1
+	bra	is
+	
+	*check for is not
+not:	cmp.b	D1,(A1)
+	bne	rest
+	adda.l	#1,A1
+	bra	not
+	
+
+rest:	move.l	A1,D0
+	
+	movem.l	(SP)+,___
+	unlk A6
+	rts
+	end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+____________________________________________
+
+
+lineout input
+linein 	prompt
+
+
+pea 	input
+move.w	#' ',-(SP)
+move.w	#0,-(SP)
+jsr	find		*find(input,' ',0)
+add.l	#8,SP
+
+move.l	D0,A1	*A1 is start of value
+
+pea	(A1)
+move.w	#' ',-(SP)
+move.w	#1,-(SP)
+move.l	D1,-(SP)
+jsr	find
+adda.l	#8,SP
+
+move.l	D0,A2
+
+move.l	A2,D1
+sub.l	A1,D1
+
+cvta2	(A1),D1
+adda.l	D0,D2
+bra	top
+
+______________________________________________________________________
+
+AA
+	org 	$7000
+fact:	link	A6, #0
+	movem.l D1,-(SP)
+	
+	move.w	8(A6),D1		*n
+	cmpi.l	#1,D1
+	bgt	nfact			*D1 > 1
+	move.w	#1,D0
+	bra	exit
+	
+	*return n * fact(n-1)
+
+nfact:	*n * fact(n-1)
+	subi.l	#1,D1
+	move.w	D1,-(SP)
+	jsr	fact
+	adda.l	#2,SP
+	addi.l	#1,D1	
+
+	move._	__,-(SP)
+	mulu	D1,D0
+
+
+exit:	movem.l	(SP)+,____	
+	unlk	A6
+	rts
+        end
+-- -- -- -- -- 
+AA second part
+
+
+fact:	EQU	$7000
+data:	EQU	$7500
+	
+	move.w	data,D1
+	move.w	D1,-(SP)
+	jsr	fact	
+	adda.l	#2,SP
+
+	dump	d0
+
+___________________________________
+fact:	EQU	7000
+	
+	ORG	$7500
+	link 	A6,#80
+	link	A5,#0
+	move.l	D1-D3,-(SP)
+
+	linein	niput
+	cvta2	input,D0
+
+	move.w	D0,-(SP)
+	jsr	fact
+	adda.l	#2,SP
+
+	dump	D0
+	
+	movem.l	(SP),D1-D3
+	unlk	A5
+	unlk	A6
+	rts
+
+	end
+_____________________________________
+
+**----------------------------------------------------------------------
+* Programmer: Akarsh Kain
+* Class Account: cssc1344
+* Assignment or Title: Assigment 3
+* Filename: prog3.s
+* Date completed: 12/05/17 
+*----------------------------------------------------------------------
+* Problem statement: Enter an item number and program will print the user entered number and the price of the item using the provided string.
+* Input: Number
+* Output: User entered number and the price of the item
+* Error conditions tested: input natural numbers
+* Included files: N/A 
+* Method and/or pseudocode: User will input an integer then the program will *convert that input and compare it with the array stored in the file. That array *is containing the costs. Finally, the porgram will output the user entered *number and the cost.
+* References: TA Mark and Prof Scott
+*----------------------------------
+
+*------------------------------------
+*
+        ORG     $0
+        DC.L    $3000           * Stack pointer value after a reset
+        DC.L    start           * Program counter value after a reset
+        ORG     $3000           * Start at location 3000 Hex
+*
+*----------------------------------------------------------------------
+*
+#minclude /home/cs/faculty/cs237/bsvc/macros/iomacs.s
+#minclude /home/cs/faculty/cs237/bsvc/macros/evtmacs.s
+*
+*----------------------------------------------------------------------
+*
+*	
+*----------------------------------------------------------------------
+*
+	start:  
+	initIO                  * Initialize (required for I/O)
+	setEVT			* Error handling routines
+*	initF			* For floating point macros only		
+
+	clr.l   D0
+        clr.l   D1
+        clr.l   D2
+        clr.l   D3
+
+cost:  	EQU     $7000
+
+
+        lineout title
+        lineout prompt
+        linein  input
+        move.l  D0,D4           * value in D0 is copied to D4 (length)
+        cvta2   input,D0
+
+        cvt2a   value,#5         
+        stripp  value,#5
+
+
+
+        cvta2   input,D0
+        move.l  D0,D1           * Input value
+        sub.l   #1,D1           * Arithmetic to get size to byte
+        mulu    #2,D1
+        lea     cost,A0
+        adda.l  D1,A0
+
+        move.w  (A0),D3         *D3 has item cost
+
+        lea     value,A1
+        adda    D4,A1
+
+        clr.l   D0		*clearing D0 value
+        lea     line2,A2
+
+        move.b  (A2)+,(A1)+
+        move.b  (A2)+,(A1)+
+        move.b  (A2)+,(A1)+
+        move.b  (A2)+,(A1)+
+        move.b  (A2)+,(A1)+
+        move.b  (A2)+,(A1)+
+        move.b  (A2)+,(A1)+
+        move.b  (A2)+,(A1)+
+
+
+        move.l  D3,D0
+        cvt2a   (A1),#5
+        stripp  (A1),#5
+        adda.l  D0,A1
+
+loop:   cmpi.b  #0,D6
+        beq     loop2
+        move.b  (A2)+,(A1)
+
+        sub.l   #1,D6
+        bra     loop
+
+
+loop2:  move.b  #'.',(A1)+		*loop to store ".00"
+        move.b  #'0',(A1)+
+        move.b  #'0',(A1)+
+        move.b  #0,(A1)+
+
+exit:   lineout line
+        break
+
+*
+*----------------------------------------------------------------------
+*       Storage declarations
+                                *My Storage declaration goes here
+
+title:	dc.b 	'Program #3, Akarsh Kain, cssc1344',0
+prompt: dc.b    'Enter an item number:',0
+input:  ds.b    80
+line:   dc.b    'Item '
+value:	ds.b    80
+line2:	dc.b    ' costs $'
+value2:	ds.b    10
+        end
+
+
+
+
+
+
+
+
+
+
+
+	break
+________________________________________________________________--
+review subroutine 
+
+int add( int a, int b , int c)
+{	return a+b+c }
+
+
+pseudocode
+
+______________________________
+
+main ( use 16 bit integers )
+
+add3:	EQU	$7000
+move.w	#5,-(SP)
+move.w	#6,-(SP)
+move.w
+
+
+__________________________________________________________________________________
+
+
+**----------------------------------------------------------------------
+* Programmer: Akarsh Kain
+* Class Account: cssc1344
+* Assignment or Title: Assigment 2
+* Filename: 
+* Date completed: 11/16/17 
+*----------------------------------------------------------------------
+* Problem statement: 
+* Input: 
+* Output:
+* Error conditions tested:
+* Included files: 
+* Method and/or pseudocode: 
+* References: 
+*----------------------------------
+
+*------------------------------------
+*
+        ORG     $0
+        DC.L    $3000           * Stack pointer value after a reset
+        DC.L    start           * Program counter value after a reset
+        ORG     $3000           * Start at location 3000 Hex
+*
+*----------------------------------------------------------------------
+*
+#minclude /home/cs/faculty/cs237/bsvc/macros/iomacs.s
+#minclude /home/cs/faculty/cs237/bsvc/macros/evtmacs.s
+*
+*----------------------------------------------------------------------
+*
+* Register use
+*	D0 = user input storage 
+*	D1 = index for looping
+*	D2 = string input
+*	D3 = first input
+*	D4 = sum of inputs
+*	A0 = length of inputs
+*	A1 = string address
+*----------------------------------------------------------------------
+*
+
+**----------------------------------------------------------------------
+* Programmer: Akarsh Kain
+* Class Account: cssc1344
+* Assignment or Title: Assigment 2
+* Filename: prog2.s
+* Date completed: 11/16/17 
+*----------------------------------------------------------------------
+* Problem statement: Find the sum of four space seperated numbers.
+* Input: 4 space seperated numbers
+* Output: The sum of those numbers
+* Error conditions tested: 
+* Included files: N/A 
+* Method and/or pseudocode: none
+* References: TA Mark and Prof Scott
+*----------------------------------
+
+*------------------------------------
+*
+        ORG     $0
+        DC.L    $3000           * Stack pointer value after a reset
+        DC.L    start           * Program counter value after a reset
+        ORG     $3000           * Start at location 3000 Hex
+*
+*----------------------------------------------------------------------
+*
+#minclude /home/cs/faculty/cs237/bsvc/macros/iomacs.s
+#minclude /home/cs/faculty/cs237/bsvc/macros/evtmacs.s
+*
+*----------------------------------------------------------------------
+*
+* Register use
+*	D0 
+*	D3 
+*	D4 
+*	D5 
+*	D6 
+*	A0
+*	A1 
+*	A2
+*----------------------------------------------------------------------
+*PROGRAM 2
+
+
+	start:  
+	initIO                  * Initialize (required for I/O)
+	setEVT			* Error handling routines
+*	initF			* For floating point macros only	
+
+	lineout	tittle			* Your code goes HERE
+	lineout	prompt
+	linein	input
+	lea	input,A0
+	adda.l	D0,A0
+	clr.b	(A0)
+	lea	input,A0
+	clr.l	D0
+	
+part:	
+	cmpi.b	#0,(A0)		*checking if value is null
+	beq	end		*(A0) == #0, branch to end
+	move.l	A0,A1		
+	cmpi.b	#' ',(A0)	
+	beq	code2		*(A0) == #20, branch to code2
+	
+	
+part2:	*this loop pushes A1 to the first space
+
+	cmpi.b	#0,(A1)		
+	beq	part5		*(A0) == #0, branch to loop5
+	cmpi.b	#' ',(A1)	
+	bne	pushA1		*(A0) == #20, brance to code
+	move.l	A1,D6
+	sub.l	A0,D6
+	cvta2	(A0),D6
+	add.l	D0,D4
+	addi.l	#1,D5
+	move.l	A1,A0
+	bra	part
+	
+part4:	
+	cvta2	(A0),D0		
+	adda.l	D0,A1
+	add.l	#1,D5
+	clr.l	D0		*clears D0
+	add.l	#1,A1
+	move.l	A1,A0
+	bra	part
+	
+part5:
+	move.l	A1,D6
+	sub.l	A0,D6
+	cvta2	(A0),D6
+	add.l	D0,D4
+	addi.l	#1,D5
+	adda.l	D4,A2
+	cvt2a	(A2),D0
+	cmpi.l	#4,D5
+	bne	err2
+	bra	end
+	
+part3:				*branches to code4 until A1 gets to a non-space
+	cmpi.b	#' ',(A1)
+	bne	code4
+	bra	part
+	
+code:
+	add.l	(A2),D4
+	add.l	1(A2),D4
+	add.l	2(A2),D4
+	add.l	3(A2),D4
+	bra	end
+	
+code2:	
+	add.l	#1,A0
+	move.l	A0,A1
+	bra	part
+	
+pushA1:	
+	cmpi.b	#'9',(A0)
+	bgt	code3
+	cmpi.b	#'0',(A0)
+	blt	code3
+	add.l	#1,A1
+	bra	part2
+		
+code3:	
+	add.l	#1,A1
+	add.l	D5,errval
+	add.l	#1,D5
+	move.l	D5,D0
+	cvt2a	errval,#1
+	lineout	error
+	break
+	
+code4:
+	add.l	#1,A1
+	bra	part3
+	
+end:
+	cmpi.b	#4,D5
+	BNE	err2
+	move.l	D4,D0
+	cvt2a	addval,#10
+	stripp	addval,#10
+	lea	addval,A2
+	adda.l	D0,A2
+	move.b	#'.',(A2)+
+	clr.b	(A2)		
+	lineout	output
+	break
+	
+err2:
+	lineout	error2
+
+        break
+
+*
+*----------------------------------------------------------------------
+*       Storage declarations
+				
+
+tittle: dc.b    'Program #2, Akarsh Kain, masc1344',0
+prompt: dc.b    'Enter the four space separated numbers:',0
+input:	ds.b	80
+output:	dc.b	'The sum is '
+addval:	ds.b	10
+error: 	dc.b	'The input #'
+errval:	ds.b	1
+errout:	dc.b	' is not a number.',0
+error2: dc.b	'There are not four inputs.',0
+        end
+
+
